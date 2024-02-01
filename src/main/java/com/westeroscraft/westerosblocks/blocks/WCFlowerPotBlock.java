@@ -44,7 +44,7 @@ public class WCFlowerPotBlock extends FlowerPotBlock implements WesterosBlockLif
                     return null;            		
             	}
             	//WesterosBlocks.log.info(String.format("emptyPotBlk=%s", emptyPotBlk.getRegistryName()));
-            	emptyPot = () -> (FlowerPotBlock) emptyPotBlk.getPotted();
+            	emptyPot = () -> emptyPotBlk;
             	if (plantBlockID != null) {
             		Block plantBlk = WesterosBlocks.findBlockByName(plantBlockID);
             		if ((plantBlk == null) || (plantBlk == Blocks.AIR)) {

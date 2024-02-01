@@ -333,7 +333,7 @@ public class WesterosBlocks {
 			WesterosBlockDef.initialize();
 			WesterosBlocksCreativeTab.init();
 			// If snow-in-taiga
-			if (Config.snowInTaiga.get()) {
+			if (false && Config.snowInTaiga.get()) {
 				Biome b = ForgeRegistries.BIOMES.getValue(new ResourceLocation("minecraft:taiga"));
 				if (b != null) {
 					b.climateSettings.temperature = -0.5F;
@@ -378,8 +378,18 @@ public class WesterosBlocks {
 			ModelExport.declareCustomTags(customConfig);
 			log.info("initialize done");
 		}
+
 		@SubscribeEvent
 		public static void onBlocksRegistry(final RegisterEvent event) {
+			event.register(ForgeRegistries.Keys.SOUND_EVENTS, (helper) -> {
+				initialize();
+                for (WesterosBlockDef customBlockDef : customBlockDefs) {
+                    if (customBlockDef == null)
+                        continue;
+                    // Register sound events
+                    customBlockDef.registerSoundEvents();
+                }
+			});
 			event.register(ForgeRegistries.Keys.BLOCKS, (helper) -> {
 				log.info("block register start");
 				// Do initialization, if needed
@@ -397,8 +407,6 @@ public class WesterosBlocks {
 					if (blk != null) {
 						blklist.add(blk);
 						customBlocksByName.put(customBlockDefs[i].blockName, blk);
-						// Register sound events
-						customBlockDefs[i].registerSoundEvents();
 						// Add to counts
 						Integer cnt = countsByType.get(customBlockDefs[i].blockType);
 						cnt = (cnt == null) ? 1 : (cnt+1);

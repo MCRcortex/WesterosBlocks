@@ -15,11 +15,13 @@ import java.util.Map;
 
 public class AuxileryUtils {
     public static BlockSetType getBlockSetType(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        return null;
+        //TODO: implment
+        return BlockSetType.OAK;
     }
 
     public static WoodType getWoodType(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        return null;
+        //TODO: implment
+        return WoodType.OAK;
     }
 
 
