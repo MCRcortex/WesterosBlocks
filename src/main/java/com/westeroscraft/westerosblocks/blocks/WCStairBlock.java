@@ -65,7 +65,7 @@ public class WCStairBlock extends StairBlock implements WesterosBlockLifecycle {
     public final boolean no_uvlock;
 
     protected WCStairBlock(BlockState modelstate, BlockBehaviour.Properties props, WesterosBlockDef def, boolean doUnconnect) {
-        super(() -> modelstate, props);
+        super(modelstate, props);
         this.def = def;
         String t = def.getType();
         boolean no_uvlock = false;

@@ -1,9 +1,8 @@
 package com.westeroscraft.westerosblocks.network;
 
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.common.util.LogicalSidedProvider;
-import net.minecraftforge.network.NetworkEvent;
-
 import com.westeroscraft.westerosblocks.WesterosBlocks;
 
 import net.minecraft.world.level.Level;
@@ -17,9 +16,7 @@ public class ClientMessageHandler {
 	 * Called when PTimeMessage received.
 	 * CALLED BY THE NETWORK THREAD, NOT THE CLIENT THREAD.
 	 */
-	public static void onPTimeMessageReceived(final PTimeMessage message,
-			Supplier<NetworkEvent.Context> ctxSupplier) {
-		NetworkEvent.Context ctx = ctxSupplier.get();
+	public static void onPTimeMessageReceived(final PTimeMessage message, CustomPayloadEvent.Context ctx) {
 		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
 		ctx.setPacketHandled(true);
 
@@ -52,9 +49,7 @@ public class ClientMessageHandler {
 	 * Called when PWeatherMessage received.
 	 * CALLED BY THE NETWORK THREAD, NOT THE CLIENT THREAD.
 	 */
-	public static void onPWeatherMessageReceived(final PWeatherMessage message,
-			Supplier<NetworkEvent.Context> ctxSupplier) {
-		NetworkEvent.Context ctx = ctxSupplier.get();
+	public static void onPWeatherMessageReceived(final PWeatherMessage message, CustomPayloadEvent.Context ctx) {
 		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
 		ctx.setPacketHandled(true);
 

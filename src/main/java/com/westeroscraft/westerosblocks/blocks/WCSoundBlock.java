@@ -1,5 +1,6 @@
 package com.westeroscraft.westerosblocks.blocks;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -131,7 +132,7 @@ public class WCSoundBlock extends WCSolidBlock {
 	}
 
 	// Compute time for next trigger
-	private int getNextTriggerTick(Random rnd) {
+	private int getNextTriggerTick(RandomSource rnd) {
 		return playback_period + rnd.nextInt(random_playback_addition + 1);
 	}
 	@SuppressWarnings("deprecation")
@@ -150,7 +151,7 @@ public class WCSoundBlock extends WCSolidBlock {
    }
 
    @Override
-   public void randomTick(BlockState state, ServerLevel world, BlockPos pos, Random random) {
+   public void randomTick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 	   if (playback_period >= 0) {
 			//WesterosBlocks.log.info("WCSoundBlock.randomTick(" + pos + ")");
 		   // No tick?  Add it (migration)
@@ -163,7 +164,7 @@ public class WCSoundBlock extends WCSolidBlock {
    }
 
 	@Override
-	public void tick(BlockState state, ServerLevel world, BlockPos pos, Random rnd) {
+	public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource rnd) {
 		//WesterosBlocks.log.info("WCSoundBlock.tick(" + pos + ")");
 		if (playback_period <= 0) { // Not periodic, so quit
 			//WesterosBlocks.log.info("WCSoundBlock.tick(" + pos + ") - not periodic");

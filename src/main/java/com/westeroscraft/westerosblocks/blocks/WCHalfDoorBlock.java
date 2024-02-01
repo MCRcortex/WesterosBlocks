@@ -1,12 +1,12 @@
 package com.westeroscraft.westerosblocks.blocks;
 
+import com.westeroscraft.westerosblocks.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,11 +35,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.api.distmarker.Dist;
 
-import com.westeroscraft.westerosblocks.WesterosBlockDef;
-import com.westeroscraft.westerosblocks.WesterosBlockLifecycle;
-import com.westeroscraft.westerosblocks.WesterosBlocks;
-import com.westeroscraft.westerosblocks.WesterosBlockFactory;
-
 import javax.annotation.Nullable;
 
 public class WCHalfDoorBlock extends Block implements WesterosBlockLifecycle {
@@ -65,6 +60,7 @@ public class WCHalfDoorBlock extends Block implements WesterosBlockLifecycle {
     private WesterosBlockDef def;
     private boolean locked = false;
     private boolean allow_unsupported = false;
+    private final AuxMaterial material;
 
     protected WCHalfDoorBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
         super(props);
@@ -84,6 +80,7 @@ public class WCHalfDoorBlock extends Block implements WesterosBlockLifecycle {
             }
         }
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPEN, Boolean.valueOf(false)).setValue(HINGE, DoorHingeSide.LEFT).setValue(POWERED, Boolean.valueOf(false)));
+        this.material = AuxMaterial.getMaterial(props, def);
     }
     @Override
     public WesterosBlockDef getWBDefinition() {
@@ -127,11 +124,11 @@ public class WCHalfDoorBlock extends Block implements WesterosBlockLifecycle {
      }
 
      private int getCloseSound() {
-        return this.material == Material.METAL ? 1011 : 1012;
+        return this.material == AuxMaterial.METAL ? 1011 : 1012;
      }
 
      private int getOpenSound() {
-        return this.material == Material.METAL ? 1005 : 1006;
+        return this.material == AuxMaterial.METAL ? 1005 : 1006;
      }
 
      @Nullable
@@ -185,7 +182,7 @@ public class WCHalfDoorBlock extends Block implements WesterosBlockLifecycle {
             state = state.cycle(OPEN);
             level.setBlock(pos, state, 10);
             level.levelEvent(player, state.getValue(OPEN) ? this.getOpenSound() : this.getCloseSound(), pos, 0);
-            level.gameEvent(player, this.isOpen(state) ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, player);
+            level.gameEvent(player, this.isOpen(state) ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, player.position());
     		// Is this a door we should be planning to close
     		if (WesterosBlocks.isAutoRestoreHalfDoor(state.getBlock())) {
     			boolean isCreative = (player != null) ? player.isCreative() : false;
@@ -213,7 +210,7 @@ public class WCHalfDoorBlock extends Block implements WesterosBlockLifecycle {
         if (block != this && flag != state.getValue(POWERED)) {
            if (flag != state.getValue(OPEN)) {
               this.playSound(level, ppos, flag);
-              level.gameEvent(flag ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, ppos);
+              level.gameEvent(flag ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, ppos, GameEvent.Context.of(state));
            }           
 
            level.setBlock(ppos, state.setValue(POWERED, Boolean.valueOf(flag)).setValue(OPEN, Boolean.valueOf(flag)), 2);

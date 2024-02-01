@@ -1,8 +1,13 @@
 package com.westeroscraft.westerosblocks.blocks;
 
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,7 +46,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 
 import java.util.List;
@@ -57,6 +62,16 @@ import com.westeroscraft.westerosblocks.WesterosBlockFactory;
 
 
 public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBlockLifecycle {
+    public static final MapCodec<WCBedBlock> CODEC = simpleCodec(WCBedBlock::createBlock);
+
+    private static WCBedBlock createBlock(BlockBehaviour.Properties props) {
+        System.err.println("AAA");
+        return null;
+    }
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return CODEC;
+    }
 
     public static class Factory extends WesterosBlockFactory {
         @Override
@@ -87,7 +102,7 @@ public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBl
     	NORMAL, RAISED, HAMMOCK
     };
     public final BedType bedType;
-    
+
     protected WCBedBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
         super(props);
         this.color = DyeColor.RED;
@@ -145,11 +160,11 @@ public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBl
                 p_49516_.removeBlock(blockpos, false);
              }
 
-             p_49516_.explode((Entity)null, DamageSource.badRespawnPointExplosion(), (ExplosionDamageCalculator)null, (double)p_49517_.getX() + 0.5D, (double)p_49517_.getY() + 0.5D, (double)p_49517_.getZ() + 0.5D, 5.0F, true, Explosion.BlockInteraction.DESTROY);
+             p_49516_.explode((Entity)null, p_49516_.damageSources().badRespawnPointExplosion(blockpos.getCenter()), (ExplosionDamageCalculator)null, (double)p_49517_.getX() + 0.5D, (double)p_49517_.getY() + 0.5D, (double)p_49517_.getZ() + 0.5D, 5.0F, true, Level.ExplosionInteraction.BLOCK);
              return InteractionResult.SUCCESS;
           } else if (p_49515_.getValue(OCCUPIED)) {
              if (!this.kickVillagerOutOfBed(p_49516_, p_49517_)) {
-                p_49518_.displayClientMessage(new TranslatableComponent("block.minecraft.bed.occupied"), true);
+                p_49518_.displayClientMessage(Component.translatable("block.minecraft.bed.occupied"), true);
              }
 
              return InteractionResult.SUCCESS;
@@ -215,7 +230,7 @@ public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBl
        return p_49534_ == BedPart.FOOT ? p_49535_ : p_49535_.getOpposite();
     }
 
-    public void playerWillDestroy(Level p_49505_, BlockPos p_49506_, BlockState p_49507_, Player p_49508_) {
+    public BlockState playerWillDestroy(Level p_49505_, BlockPos p_49506_, BlockState p_49507_, Player p_49508_) {
        if (!p_49505_.isClientSide && p_49508_.isCreative()) {
           BedPart bedpart = p_49507_.getValue(PART);
           if (bedpart == BedPart.FOOT) {
@@ -228,7 +243,7 @@ public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBl
           }
        }
 
-       super.playerWillDestroy(p_49505_, p_49506_, p_49507_, p_49508_);
+       return super.playerWillDestroy(p_49505_, p_49506_, p_49507_, p_49508_);
     }
 
     @Nullable

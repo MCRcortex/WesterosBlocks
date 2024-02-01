@@ -30,7 +30,7 @@ public class WCFenceGateBlock extends FenceGateBlock implements WesterosBlockLif
     private boolean locked = false;
 
     protected WCFenceGateBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(props);
+        super(AuxileryUtils.getWoodType(props, def), props);
         this.def = def;
         String type = def.getType();
         if (type != null) {

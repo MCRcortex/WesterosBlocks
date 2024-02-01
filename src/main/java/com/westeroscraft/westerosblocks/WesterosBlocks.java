@@ -1,5 +1,8 @@
 package com.westeroscraft.westerosblocks;
 
+import com.westeroscraft.westerosblocks.blocks.AuxileryUtils;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,11 +17,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ColorHandlerEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -31,9 +34,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import net.minecraftforge.registries.RegisterEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -68,8 +74,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Map.Entry;
-
-import net.minecraftforge.network.NetworkRegistry;
 
 import com.westeroscraft.westerosblocks.network.ClientMessageHandler;
 import com.westeroscraft.westerosblocks.network.PWeatherMessage;
@@ -189,7 +193,7 @@ public class WesterosBlocks {
 								ModelExport.addWorldConverterItemMap(customBlockDefs[i].legacyBlockID, customBlockDefs[i].blockName);
 							}
 						} catch (IOException iox) {
-							log.warn(String.format("Error exporting block %s - %s", blk.getRegistryName(), iox));
+							log.warn(String.format("Error exporting block %s - %s", blk.getName(), iox));
 						}
 					}
 				}
@@ -271,7 +275,7 @@ public class WesterosBlocks {
 	@Mod.EventBusSubscriber(modid = WesterosBlocks.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 	public class ColorHandler {
 	    @SubscribeEvent
-	    public static void registerItemColors(ColorHandlerEvent.Item event) {
+	    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
 	        for (Block blk : WesterosBlocks.customBlocks) {
 	     	   if (blk instanceof WesterosBlockLifecycle) {
 	     		   WesterosBlockDef def = ((WesterosBlockLifecycle)blk).getWBDefinition();
@@ -293,7 +297,7 @@ public class WesterosBlocks {
 	        }	    	
 	    }
 	    @SubscribeEvent
-	    public static void registerBlockColors(ColorHandlerEvent.Block event) {
+	    public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
 	        for (Block blk : WesterosBlocks.customBlocks) {
 	     	   if (blk instanceof WesterosBlockLifecycle) {
 	     		   WesterosBlockDef def = ((WesterosBlockLifecycle)blk).getWBDefinition();
@@ -332,8 +336,10 @@ public class WesterosBlocks {
 			if (Config.snowInTaiga.get()) {
 				Biome b = ForgeRegistries.BIOMES.getValue(new ResourceLocation("minecraft:taiga"));
 				if (b != null) {
-					b.climateSettings.temperature = -0.5F; 
-					b.climateSettings.precipitation = Biome.Precipitation.SNOW;
+					b.climateSettings.temperature = -0.5F;
+
+					//TODO:FIXME
+					//b.climateSettings.precipitation = Biome.Precipitation.SNOW;
 				}
 				log.info("Enabled snow in TAIGA");
 			}
@@ -373,51 +379,53 @@ public class WesterosBlocks {
 			log.info("initialize done");
 		}
 		@SubscribeEvent
-		public static void onBlocksRegistry(final RegistryEvent.Register<Block> event) {
-			log.info("block register start");
-			// Do initialization, if needed
-			initialize();
+		public static void onBlocksRegistry(final RegisterEvent event) {
+			event.register(ForgeRegistries.Keys.BLOCKS, (helper) -> {
+				log.info("block register start");
+				// Do initialization, if needed
+				initialize();
 
-			// Construct custom block definitions
-			List<Block> blklist = new LinkedList<Block>();
-			customBlocksByName = new HashMap<String, Block>();
-			HashMap<String, Integer> countsByType = new HashMap<String, Integer>();
-			int blockcount = 0;
-			for (int i = 0; i < customBlockDefs.length; i++) {
-				if (customBlockDefs[i] == null)
-					continue;
-				Block blk = customBlockDefs[i].createBlock();
-				if (blk != null) {
-					blklist.add(blk);
-					customBlocksByName.put(customBlockDefs[i].blockName, blk);
-					// Register sound events
-					customBlockDefs[i].registerSoundEvents();
-					// Add to counts
-					Integer cnt = countsByType.get(customBlockDefs[i].blockType);
-					cnt = (cnt == null) ? 1 : (cnt+1);
-					countsByType.put(customBlockDefs[i].blockType, cnt);					
-					blockcount++;
-				} else {
-					// crash("Invalid block definition for " + customBlockDefs[i].blockName + " -
-					// aborted during load()");
-					// return;
+				// Construct custom block definitions
+				List<Block> blklist = new LinkedList<Block>();
+				customBlocksByName = new HashMap<String, Block>();
+				HashMap<String, Integer> countsByType = new HashMap<String, Integer>();
+				int blockcount = 0;
+				for (int i = 0; i < customBlockDefs.length; i++) {
+					if (customBlockDefs[i] == null)
+						continue;
+					Block blk = customBlockDefs[i].createBlock();
+					if (blk != null) {
+						blklist.add(blk);
+						customBlocksByName.put(customBlockDefs[i].blockName, blk);
+						// Register sound events
+						customBlockDefs[i].registerSoundEvents();
+						// Add to counts
+						Integer cnt = countsByType.get(customBlockDefs[i].blockType);
+						cnt = (cnt == null) ? 1 : (cnt+1);
+						countsByType.put(customBlockDefs[i].blockType, cnt);
+						blockcount++;
+					} else {
+						// crash("Invalid block definition for " + customBlockDefs[i].blockName + " -
+						// aborted during load()");
+						// return;
+					}
 				}
-			}
-			customBlocks = blklist.toArray(new Block[blklist.size()]);
-			WesterosBlockDef.dumpBlockPerf();
-			// Brag on block type counts
-			log.info("Count of custom blocks by type:");
-			for (String type : countsByType.keySet()) {
-				log.info(type + ": " + countsByType.get(type) + " blocks");				
-			}
-			log.info("TOTAL: " + blockcount + " blocks");
-			colorMaps = customConfig.colorMaps;
-			menuOverrides = customConfig.menuOverrides;
-			log.info("block register done");
+				customBlocks = blklist.toArray(new Block[blklist.size()]);
+				WesterosBlockDef.dumpBlockPerf();
+				// Brag on block type counts
+				log.info("Count of custom blocks by type:");
+				for (String type : countsByType.keySet()) {
+					log.info(type + ": " + countsByType.get(type) + " blocks");
+				}
+				log.info("TOTAL: " + blockcount + " blocks");
+				colorMaps = customConfig.colorMaps;
+				menuOverrides = customConfig.menuOverrides;
+				log.info("block register done");
+			});
 		}
+
 		@SubscribeEvent
-		public static void onItemsRegistry(final RegistryEvent.Register<Item> event) {
-			log.info("item register start");
+		public void buildContents(BuildCreativeModeTabContentsEvent event) {
 			if (menuOverrides != null) {
 				for (WesterosItemMenuOverrides mo : menuOverrides) {
 					if (mo.blockNames != null) {
@@ -425,22 +433,30 @@ public class WesterosBlocks {
 							Item itm = ForgeRegistries.ITEMS.getValue(new ResourceLocation(bn));
 							if (itm == null) {
 								log.warn("Item for " + bn + " not found - cannot override");
-							}
-							else {
+							} else {
 								CreativeModeTab tab = null;
 								if (mo.creativeTab != null) {
 									tab = WesterosBlockDef.getCreativeTab(mo.creativeTab);
 								}
-								itm.category = tab;
-								//log.info("Item for " + bn + " set to tab " + mo.creativeTab);
+								if (event.getTab() == tab) {
+									event.accept(itm);
+								}
+								log.info("Item for " + bn + " set to tab " + mo.creativeTab);
 							}
 						}
 					}
 				}
 			}
-			log.info("item register done");
+
+			Set<BlockItem> blockItems = AuxileryUtils.BLOCK_ITEM_TABS.get(event.getTab());
+			if (blockItems != null) {
+				for (BlockItem item : blockItems) {
+					event.accept(item);
+				}
+			}
 		}
 	}
+
 
 	public static WesterosBlockConfig loadBlockConfig(String filename) throws BlockConfigNotFoundException, JsonParseException {
 		// Read our block definition resource
@@ -541,9 +557,9 @@ public class WesterosBlocks {
 		SoundEvent event = registered_sounds.get(soundName);
 		if (event == null) {
 			ResourceLocation location = new ResourceLocation(WesterosBlocks.MOD_ID, soundName);
-			event = new SoundEvent(location);
-			event.setRegistryName(location);
-			ForgeRegistries.SOUND_EVENTS.register(event);
+			event = SoundEvent.createVariableRangeEvent(location);
+			//event.setRegistryName(location);
+			ForgeRegistries.SOUND_EVENTS.register(location, event);
 			registered_sounds.put(soundName, event);
 		}
 		return event;
@@ -555,18 +571,17 @@ public class WesterosBlocks {
 	
     @SubscribeEvent
     public void onCommonSetupEvent(FMLCommonSetupEvent event) {
-	    simpleChannel = NetworkRegistry.newSimpleChannel(simpleChannelRL, () -> MESSAGE_PROTOCOL_VERSION,
-	            ClientMessageHandler::isThisProtocolAcceptedByClient,
-	            ServerMessageHandler::isThisProtocolAcceptedByServer);
-
-	    simpleChannel.registerMessage(PTimeMessage.PTIME_MSGID, PTimeMessage.class,
-	    		PTimeMessage::encode, PTimeMessage::decode,
-	            ClientMessageHandler::onPTimeMessageReceived,
-	            Optional.of(NetworkDirection.PLAY_TO_CLIENT));
-	    simpleChannel.registerMessage(PWeatherMessage.PWEATHER_MSGID, PWeatherMessage.class,
-	    		PWeatherMessage::encode, PWeatherMessage::decode,
-	            ClientMessageHandler::onPWeatherMessageReceived,
-	            Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+	    simpleChannel = ChannelBuilder.named(simpleChannelRL).networkProtocolVersion(1).simpleChannel()
+				.messageBuilder(PTimeMessage.class, NetworkDirection.PLAY_TO_CLIENT)
+				.encoder(PTimeMessage::encode)
+				.decoder(PTimeMessage::decode)
+				.consumerNetworkThread(ClientMessageHandler::onPTimeMessageReceived)
+				.add()
+				.messageBuilder(PWeatherMessage.class, NetworkDirection.PLAY_TO_CLIENT)
+				.encoder(PWeatherMessage::encode)
+				.decoder(PWeatherMessage::decode)
+				.consumerNetworkThread(ClientMessageHandler::onPWeatherMessageReceived)
+				.add();
 	  }
     
     // Directory tree delete

@@ -2,6 +2,7 @@ package com.westeroscraft.westerosblocks.blocks;
 
 import javax.annotation.Nullable;
 
+import com.westeroscraft.westerosblocks.AuxMaterial;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +15,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 
 import com.westeroscraft.westerosblocks.WesterosBlockDef;
 import com.westeroscraft.westerosblocks.WesterosBlockLifecycle;
@@ -112,6 +112,6 @@ public class WCFenceBlock extends FenceBlock implements WesterosBlockLifecycle {
     private static String[] TAGS2 = { "fences", "wooden_fences" };
     @Override
     public String[] getBlockTags() {
-    	return def.getMaterial() == Material.WOOD ? TAGS2 : TAGS;
+    	return def.getMaterial() == AuxMaterial.WOOD ? TAGS2 : TAGS;
     }    
 }

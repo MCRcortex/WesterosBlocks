@@ -1,8 +1,8 @@
 package com.westeroscraft.westerosblocks.network;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.NetworkEvent;
 
 import com.westeroscraft.westerosblocks.WesterosBlocks;
 
@@ -14,10 +14,8 @@ public class ServerMessageHandler {
 	 * Called when a message is received of the appropriate type. CALLED BY THE
 	 * NETWORK THREAD, NOT THE SERVER THREAD
 	 */
-	public static void onMessageReceived(final PTimeMessage message,
-			Supplier<NetworkEvent.Context> ctxSupplier) {
+	public static void onMessageReceived(final PTimeMessage message, CustomPayloadEvent.Context ctx) {
 		// Get and mark packet handled
-		NetworkEvent.Context ctx = ctxSupplier.get();
 		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
 		ctx.setPacketHandled(true);
 

@@ -6,8 +6,8 @@ import com.westeroscraft.westerosblocks.WesterosBlocks;
 import com.westeroscraft.westerosblocks.network.PTimeMessage;
 
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraft.commands.arguments.TimeArgument;
 import net.minecraft.commands.CommandSourceStack;
@@ -70,10 +70,10 @@ public class PTimeCommand {
 		if (source.getEntity() instanceof ServerPlayer) {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			// Send relative of zero for reset
-			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player), new PTimeMessage(true, 0));
-			source.sendSuccess(new TextComponent("Reset player time to server time"), true);
+			WesterosBlocks.simpleChannel.send(new PTimeMessage(true, 0), PacketDistributor.PLAYER.with(player));
+			source.sendSuccess(()->Component.literal("Reset player time to server time"), true);
 		} else {
-			source.sendFailure(new TextComponent("Cannot be used by console"));
+			source.sendFailure(Component.literal("Cannot be used by console"));
 		}
 		
 		return 1;
@@ -84,12 +84,10 @@ public class PTimeCommand {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			//WesterosBlocks.log.info("Set time to " + player.getName().toString() + " to relative=" + relative
 			//		+ ", offset=" + timeticks);
-			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player),
-					new PTimeMessage(relative, timeticks));
-			source.sendSuccess(
-					new TextComponent("Set player time to " + timeticks + (relative ? "(relative)" : "")), true);
+			WesterosBlocks.simpleChannel.send(new PTimeMessage(relative, timeticks), PacketDistributor.PLAYER.with(player));
+			source.sendSuccess(()->Component.literal("Set player time to " + timeticks + (relative ? "(relative)" : "")), true);
 		} else {
-			source.sendFailure(new TextComponent("Cannot be used by console"));
+			source.sendFailure(Component.literal("Cannot be used by console"));
 		}
 		return 1;
 	}

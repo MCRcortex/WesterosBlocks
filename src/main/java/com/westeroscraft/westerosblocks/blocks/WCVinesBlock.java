@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -253,8 +254,9 @@ public class WCVinesBlock extends VineBlock implements WesterosBlockLifecycle {
      }
 
      @Override
-     public void randomTick(BlockState p_225542_1_, ServerLevel p_225542_2_, BlockPos p_225542_3_, Random p_225542_4_) {
+     public void randomTick(BlockState p_225542_1_, ServerLevel p_225542_2_, BlockPos p_225542_3_, RandomSource p_225542_4_) {
      }
+
      @Override
      protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> container) {
     	 container.add(UP, NORTH, EAST, SOUTH, WEST, DOWN, WATERLOGGED);

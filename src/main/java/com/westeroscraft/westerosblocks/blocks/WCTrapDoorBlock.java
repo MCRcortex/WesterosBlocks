@@ -31,7 +31,7 @@ public class WCTrapDoorBlock extends TrapDoorBlock implements WesterosBlockLifec
     private boolean locked = false;
     
     protected WCTrapDoorBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(props);
+        super(AuxileryUtils.getBlockSetType(props, def), props);
         this.def = def;
         String type = def.getType();
         if (type != null) {

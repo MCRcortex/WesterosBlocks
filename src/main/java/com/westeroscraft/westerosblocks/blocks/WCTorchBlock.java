@@ -35,7 +35,7 @@ public class WCTorchBlock extends TorchBlock implements WesterosBlockLifecycle {
     private WesterosBlockDef def;
     private boolean allow_unsupported = false;
 
-    private static ParticleOptions getParticle(String typeStr) {
+    private static SimpleParticleType getParticle(String typeStr) {
         if (typeStr != null && typeStr.contains("no-particle")) {
             return new SimpleParticleType(false);
         }
@@ -43,7 +43,7 @@ public class WCTorchBlock extends TorchBlock implements WesterosBlockLifecycle {
     }
     
     protected WCTorchBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(props, WCTorchBlock.getParticle(def.getType()));
+        super(WCTorchBlock.getParticle(def.getType()), props);
         this.def = def;
         String t = def.getType();
         if (t != null) {
