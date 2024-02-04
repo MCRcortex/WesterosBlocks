@@ -8,6 +8,9 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.Level;
+
+import java.util.Random;
 
 import com.westeroscraft.westerosblocks.WesterosBlockDef;
 import com.westeroscraft.westerosblocks.WesterosBlockLifecycle;
@@ -15,6 +18,7 @@ import com.westeroscraft.westerosblocks.WesterosBlockLifecycle;
 public class WCWallTorchBlock extends WallTorchBlock implements WesterosBlockLifecycle {
     private WesterosBlockDef def;
     private boolean allow_unsupported = false;
+    private boolean no_particle = false;
 
     private static SimpleParticleType getParticle(String typeStr) {
         if (typeStr != null && typeStr.contains("no-particle")) {
@@ -22,9 +26,9 @@ public class WCWallTorchBlock extends WallTorchBlock implements WesterosBlockLif
         }
         return ParticleTypes.FLAME;
     }
-    
+
     protected WCWallTorchBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(props, WCWallTorchBlock.getParticle(def.getType()));
+        super(props, ParticleTypes.FLAME);
         this.def = def;
         String t = def.getType();
         if (t != null) {
@@ -33,6 +37,9 @@ public class WCWallTorchBlock extends WallTorchBlock implements WesterosBlockLif
                 if (tok.equals("allow-unsupported")) {
                     allow_unsupported = true;
                 }
+                else if (tok.equals("no-particle")) {
+                    no_particle = true;
+                }
             }
         }
     }
@@ -40,6 +47,11 @@ public class WCWallTorchBlock extends WallTorchBlock implements WesterosBlockLif
     @Override
     public WesterosBlockDef getWBDefinition() {
         return def;
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, Random rnd) {
+        if (!this.no_particle) super.animateTick(state, level, pos, rnd);
     }
 
     @Override
