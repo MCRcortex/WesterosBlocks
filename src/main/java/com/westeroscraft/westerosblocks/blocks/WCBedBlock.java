@@ -62,16 +62,6 @@ import com.westeroscraft.westerosblocks.WesterosBlockFactory;
 
 
 public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBlockLifecycle {
-    public static final MapCodec<WCBedBlock> CODEC = simpleCodec(WCBedBlock::createBlock);
-
-    private static WCBedBlock createBlock(BlockBehaviour.Properties props) {
-        System.err.println("AAA");
-        return null;
-    }
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
-    }
 
     public static class Factory extends WesterosBlockFactory {
         @Override
@@ -230,7 +220,7 @@ public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBl
        return p_49534_ == BedPart.FOOT ? p_49535_ : p_49535_.getOpposite();
     }
 
-    public BlockState playerWillDestroy(Level p_49505_, BlockPos p_49506_, BlockState p_49507_, Player p_49508_) {
+    public void playerWillDestroy(Level p_49505_, BlockPos p_49506_, BlockState p_49507_, Player p_49508_) {
        if (!p_49505_.isClientSide && p_49508_.isCreative()) {
           BedPart bedpart = p_49507_.getValue(PART);
           if (bedpart == BedPart.FOOT) {
@@ -242,8 +232,6 @@ public class WCBedBlock extends HorizontalDirectionalBlock implements WesterosBl
              }
           }
        }
-
-       return super.playerWillDestroy(p_49505_, p_49506_, p_49507_, p_49508_);
     }
 
     @Nullable

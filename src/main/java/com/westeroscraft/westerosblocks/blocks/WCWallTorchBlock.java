@@ -24,7 +24,7 @@ public class WCWallTorchBlock extends WallTorchBlock implements WesterosBlockLif
     }
     
     protected WCWallTorchBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(WCWallTorchBlock.getParticle(def.getType()), props);
+        super(props, WCWallTorchBlock.getParticle(def.getType()));
         this.def = def;
         String t = def.getType();
         if (t != null) {

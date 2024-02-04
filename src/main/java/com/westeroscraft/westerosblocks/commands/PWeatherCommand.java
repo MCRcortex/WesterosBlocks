@@ -31,7 +31,8 @@ public class PWeatherCommand {
 		if (source.getEntity() instanceof ServerPlayer) {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			// Send relative of zero for reset
-			WesterosBlocks.simpleChannel.send(new PWeatherMessage(PWeatherMessage.WeatherCond.RESET), PacketDistributor.PLAYER.with(player));
+			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(()->player),
+					new PWeatherMessage(PWeatherMessage.WeatherCond.RESET));
 			source.sendSuccess(()->Component.literal("Reset player weather to server weather"), true);
 		} else {
 			source.sendFailure(Component.literal("Cannot be used by console"));
@@ -43,7 +44,7 @@ public class PWeatherCommand {
 		if (source.getEntity() instanceof ServerPlayer) {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			// Send relative of zero for reset
-			WesterosBlocks.simpleChannel.send(new PWeatherMessage(cond), PacketDistributor.PLAYER.with(player));
+			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(()->player), new PWeatherMessage(cond));
 			source.sendSuccess(()->Component.literal("Set player weather to " + cond), true);
 		} else {
 			source.sendFailure(Component.literal("Cannot be used by console"));

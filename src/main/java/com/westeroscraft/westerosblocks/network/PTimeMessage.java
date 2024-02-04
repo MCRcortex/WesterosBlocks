@@ -5,6 +5,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import com.westeroscraft.westerosblocks.WesterosBlocks;
 
 public class PTimeMessage {
+	public static int PTIME_MSGID = 0x01;
 	public boolean relative; // Indicates whether time_off is fixed (false) or relative (true)
 	public int time_off; // Absolute time in day, or offset, in ticks
 

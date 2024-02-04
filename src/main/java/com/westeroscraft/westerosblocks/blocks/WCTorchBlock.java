@@ -43,7 +43,7 @@ public class WCTorchBlock extends TorchBlock implements WesterosBlockLifecycle {
     }
     
     protected WCTorchBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(WCTorchBlock.getParticle(def.getType()), props);
+        super(props, WCTorchBlock.getParticle(def.getType()));
         this.def = def;
         String t = def.getType();
         if (t != null) {

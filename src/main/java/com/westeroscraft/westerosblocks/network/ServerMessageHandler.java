@@ -1,10 +1,10 @@
 package com.westeroscraft.westerosblocks.network;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 import com.westeroscraft.westerosblocks.WesterosBlocks;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -14,8 +14,10 @@ public class ServerMessageHandler {
 	 * Called when a message is received of the appropriate type. CALLED BY THE
 	 * NETWORK THREAD, NOT THE SERVER THREAD
 	 */
-	public static void onMessageReceived(final PTimeMessage message, CustomPayloadEvent.Context ctx) {
+	public static void onMessageReceived(final PTimeMessage message,
+										 Supplier<NetworkEvent.Context> ctxSupplier) {
 		// Get and mark packet handled
+		NetworkEvent.Context ctx = ctxSupplier.get();
 		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
 		ctx.setPacketHandled(true);
 
@@ -23,10 +25,10 @@ public class ServerMessageHandler {
 			WesterosBlocks.log.warn("PTimeMessage received on wrong side:" + ctx.getDirection().getReceptionSide());
 			return;
 		}
-	    final ServerPlayer sendingPlayer = ctx.getSender();
-	    if (sendingPlayer == null) {
-	    	WesterosBlocks.log.warn("EntityPlayerMP was null when AirstrikeMessageToServer was received");
-	    }
+		final ServerPlayer sendingPlayer = ctx.getSender();
+		if (sendingPlayer == null) {
+			WesterosBlocks.log.warn("EntityPlayerMP was null when AirstrikeMessageToServer was received");
+		}
 		// Enqueue processing to happen on server thread next tick
 		ctx.enqueueWork(() -> processMessage(sendingPlayer, message));
 	}

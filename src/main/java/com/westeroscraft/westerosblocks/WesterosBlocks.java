@@ -1,6 +1,8 @@
 package com.westeroscraft.westerosblocks;
 
 import com.westeroscraft.westerosblocks.blocks.AuxileryUtils;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
@@ -34,9 +36,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.SimpleChannel;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import net.minecraftforge.registries.RegisterEvent;
@@ -412,6 +413,9 @@ public class WesterosBlocks {
 						cnt = (cnt == null) ? 1 : (cnt+1);
 						countsByType.put(customBlockDefs[i].blockType, cnt);
 						blockcount++;
+						if (customBlockDefs[i].overlayTextures != null) {
+							ItemBlockRenderTypes.setRenderLayer(blk, RenderType.cutout());
+						}
 					} else {
 						// crash("Invalid block definition for " + customBlockDefs[i].blockName + " -
 						// aborted during load()");
@@ -578,7 +582,22 @@ public class WesterosBlocks {
 	}
 	
     @SubscribeEvent
-    public void onCommonSetupEvent(FMLCommonSetupEvent event) {
+    public void onCommonSetupEvent(FMLCommonSetupEvent event)
+	{
+		simpleChannel = NetworkRegistry.newSimpleChannel(simpleChannelRL, () -> MESSAGE_PROTOCOL_VERSION,
+				ClientMessageHandler::isThisProtocolAcceptedByClient,
+				ServerMessageHandler::isThisProtocolAcceptedByServer);
+
+		simpleChannel.registerMessage(PTimeMessage.PTIME_MSGID, PTimeMessage.class,
+				PTimeMessage::encode, PTimeMessage::decode,
+				ClientMessageHandler::onPTimeMessageReceived,
+				Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+		simpleChannel.registerMessage(PWeatherMessage.PWEATHER_MSGID, PWeatherMessage.class,
+				PWeatherMessage::encode, PWeatherMessage::decode,
+				ClientMessageHandler::onPWeatherMessageReceived,
+				Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+	}
+	/*{
 	    simpleChannel = ChannelBuilder.named(simpleChannelRL).networkProtocolVersion(1).simpleChannel()
 				.messageBuilder(PTimeMessage.class, NetworkDirection.PLAY_TO_CLIENT)
 				.encoder(PTimeMessage::encode)
@@ -591,6 +610,8 @@ public class WesterosBlocks {
 				.consumerNetworkThread(ClientMessageHandler::onPWeatherMessageReceived)
 				.add();
 	  }
+
+	 */
     
     // Directory tree delete
     public static boolean deleteDirectory(File directoryToBeDeleted) {

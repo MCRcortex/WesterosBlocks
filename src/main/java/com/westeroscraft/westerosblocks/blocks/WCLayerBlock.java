@@ -133,8 +133,8 @@ public class WCLayerBlock extends Block implements WesterosBlockLifecycle, Simpl
 
 
 	@Override
-	public boolean canPlaceLiquid(@org.jetbrains.annotations.Nullable Player p_298313_, BlockGetter p_56301_, BlockPos p_56302_, BlockState p_56303_, Fluid p_56304_) {
-		return p_56303_.getValue(LAYERS) < layerCount && SimpleWaterloggedBlock.super.canPlaceLiquid(p_298313_, p_56301_, p_56302_, p_56303_, p_56304_);
+	public boolean canPlaceLiquid(BlockGetter p_56301_, BlockPos p_56302_, BlockState p_56303_, Fluid p_56304_) {
+		return p_56303_.getValue(LAYERS) < layerCount && SimpleWaterloggedBlock.super.canPlaceLiquid(p_56301_, p_56302_, p_56303_, p_56304_);
 	}
 
 	@SuppressWarnings("deprecation")

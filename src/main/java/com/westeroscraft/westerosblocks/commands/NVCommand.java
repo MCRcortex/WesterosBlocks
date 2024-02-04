@@ -36,7 +36,7 @@ public class NVCommand {
 		} else {
 			source.sendFailure(Component.literal("Cannot be used by console"));
 		}
-		
+
 		return 1;
 	}
 
@@ -45,7 +45,8 @@ public class NVCommand {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			WesterosBlocks.log.info("Set time to " + player.getName().toString() + " to relative=" + relative
 					+ ", offset=" + timeticks);
-			WesterosBlocks.simpleChannel.send(new PTimeMessage(relative, timeticks), PacketDistributor.PLAYER.with(player));
+			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(() -> player),
+					new PTimeMessage(relative, timeticks));
 			source.sendSuccess(()->Component.literal("Set player time to " + timeticks + (relative ? "(relative)" : "")), true);
 		} else {
 			source.sendFailure(Component.literal("Cannot be used by console"));

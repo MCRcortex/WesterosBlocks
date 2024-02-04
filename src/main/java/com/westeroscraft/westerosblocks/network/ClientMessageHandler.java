@@ -1,22 +1,23 @@
 package com.westeroscraft.westerosblocks.network;
 
-import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import com.westeroscraft.westerosblocks.WesterosBlocks;
 
 import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class ClientMessageHandler {
-
 	/**
 	 * Called when PTimeMessage received.
 	 * CALLED BY THE NETWORK THREAD, NOT THE CLIENT THREAD.
 	 */
-	public static void onPTimeMessageReceived(final PTimeMessage message, CustomPayloadEvent.Context ctx) {
+	public static void onPTimeMessageReceived(final PTimeMessage message,
+											  Supplier<NetworkEvent.Context> ctxSupplier) {
+		NetworkEvent.Context ctx = ctxSupplier.get();
 		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
 		ctx.setPacketHandled(true);
 
@@ -35,7 +36,7 @@ public class ClientMessageHandler {
 
 	public static boolean ptimeRelative = true;
 	public static int ptimeOffset = 0;
-	
+
 	// This message is called from the Client thread.
 	// It spawns a number of Particle particles at the target location within a
 	// short range around the target location
@@ -49,7 +50,9 @@ public class ClientMessageHandler {
 	 * Called when PWeatherMessage received.
 	 * CALLED BY THE NETWORK THREAD, NOT THE CLIENT THREAD.
 	 */
-	public static void onPWeatherMessageReceived(final PWeatherMessage message, CustomPayloadEvent.Context ctx) {
+	public static void onPWeatherMessageReceived(final PWeatherMessage message,
+												 Supplier<NetworkEvent.Context> ctxSupplier) {
+		NetworkEvent.Context ctx = ctxSupplier.get();
 		LogicalSide sideReceived = ctx.getDirection().getReceptionSide();
 		ctx.setPacketHandled(true);
 
@@ -77,27 +80,27 @@ public class ClientMessageHandler {
 		WesterosBlocks.log.info("Got PWeatherMessage: " + message.weather);
 		weatherCond = message.weather;
 		switch (weatherCond) {
-		case RESET:
-			worldClient.getLevelData().setRaining(savedRain);
-			worldClient.setRainLevel(savedRainLevel);
-			worldClient.setThunderLevel(savedThunderLevel);
-			break;
-		case CLEAR:
-			worldClient.getLevelData().setRaining(false);
-			worldClient.setRainLevel(0.0F);
-			worldClient.setThunderLevel(0.0F);
-			break;
-		case RAIN:
-			worldClient.getLevelData().setRaining(true);
-			worldClient.setRainLevel(1.0F);
-			worldClient.setThunderLevel(0.0F);
-			break;
-		case THUNDER:
-			worldClient.getLevelData().setRaining(true);
-			worldClient.setRainLevel(1.0F);
-			worldClient.setThunderLevel(1.0F);
-			break;
-		}		
+			case RESET:
+				worldClient.getLevelData().setRaining(savedRain);
+				worldClient.setRainLevel(savedRainLevel);
+				worldClient.setThunderLevel(savedThunderLevel);
+				break;
+			case CLEAR:
+				worldClient.getLevelData().setRaining(false);
+				worldClient.setRainLevel(0.0F);
+				worldClient.setThunderLevel(0.0F);
+				break;
+			case RAIN:
+				worldClient.getLevelData().setRaining(true);
+				worldClient.setRainLevel(1.0F);
+				worldClient.setThunderLevel(0.0F);
+				break;
+			case THUNDER:
+				worldClient.getLevelData().setRaining(true);
+				worldClient.setRainLevel(1.0F);
+				worldClient.setThunderLevel(1.0F);
+				break;
+		}
 	}
 
 	public static boolean isThisProtocolAcceptedByClient(String protocolVersion) {

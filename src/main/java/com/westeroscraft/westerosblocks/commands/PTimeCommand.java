@@ -70,7 +70,7 @@ public class PTimeCommand {
 		if (source.getEntity() instanceof ServerPlayer) {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			// Send relative of zero for reset
-			WesterosBlocks.simpleChannel.send(new PTimeMessage(true, 0), PacketDistributor.PLAYER.with(player));
+			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(()->player), new PTimeMessage(true, 0));
 			source.sendSuccess(()->Component.literal("Reset player time to server time"), true);
 		} else {
 			source.sendFailure(Component.literal("Cannot be used by console"));
@@ -84,7 +84,7 @@ public class PTimeCommand {
 			ServerPlayer player = (ServerPlayer) source.getEntity();
 			//WesterosBlocks.log.info("Set time to " + player.getName().toString() + " to relative=" + relative
 			//		+ ", offset=" + timeticks);
-			WesterosBlocks.simpleChannel.send(new PTimeMessage(relative, timeticks), PacketDistributor.PLAYER.with(player));
+			WesterosBlocks.simpleChannel.send(PacketDistributor.PLAYER.with(()->player), new PTimeMessage(relative, timeticks));
 			source.sendSuccess(()->Component.literal("Set player time to " + timeticks + (relative ? "(relative)" : "")), true);
 		} else {
 			source.sendFailure(Component.literal("Cannot be used by console"));

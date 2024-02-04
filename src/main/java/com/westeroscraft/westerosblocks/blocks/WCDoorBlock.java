@@ -33,7 +33,7 @@ public class WCDoorBlock extends DoorBlock implements WesterosBlockLifecycle {
     private boolean allow_unsupported = false;
 
     protected WCDoorBlock(BlockBehaviour.Properties props, WesterosBlockDef def) {
-        super(AuxileryUtils.getBlockSetType(props, def), props);
+        super(props, AuxileryUtils.getBlockSetType(props, def));
         this.def = def;
         String type = def.getType();
         if (type != null) {

@@ -535,7 +535,7 @@ public class WesterosBlockDef extends WesterosBlockStateRecord {
 						for (int zz = -1; zz <= 1; ++zz) {
 							BlockPos bp = pos.offset(xx, 0, zz);
 							Biome biome = rdr.getBiome(bp).value();
-							int mult = getColor(biome.getHeightAdjustedTemperature(bp), 1);//TODO: FIXME
+							int mult = getColor(biome.getHeightAdjustedTemperature(bp), 0.4f);//TODO: FIXME
 							red += (mult & 0xFF0000) >> 16;
 							green += (mult & 0x00FF00) >> 8;
 							blue += (mult & 0x0000FF);
@@ -570,7 +570,7 @@ public class WesterosBlockDef extends WesterosBlockStateRecord {
 			float hum = 1.0F;
 			float tmp = 0.5F;
 			if (biome != null) {
-				hum = 1;//biome.climateSettings.downfall;//TODO: FIXME
+				hum = 0.4f;//biome.climateSettings.downfall;//TODO: FIXME
 				tmp = biome.climateSettings.temperature;
 			}
 			tmp = Mth.clamp(tmp, 0.0F, 1.0F);
@@ -747,7 +747,7 @@ public class WesterosBlockDef extends WesterosBlockStateRecord {
 	public BlockBehaviour.Properties makeAndCopyProperties(Block blk) {
 		BlockBehaviour.Properties props;
 		if (blk != null) {
-			props = BlockBehaviour.Properties.ofFullCopy(blk);
+			props = BlockBehaviour.Properties.copy(blk);
 		} else {
 			AuxMaterial mat = getMaterial();
 			props = BlockBehaviour.Properties.of(); // TODO - material color?
@@ -1208,8 +1208,7 @@ public class WesterosBlockDef extends WesterosBlockStateRecord {
 	@OnlyIn(Dist.CLIENT)
 	public static void registerVanillaBlockColorHandler(String blockName, Block blk, String colorMult, BlockColors blockColors) {
 		ColorMultHandler handler = getColorHandler(colorMult, blockName);
-		blockColors.register((BlockState state, BlockAndTintGetter world, BlockPos pos, int txtindx) -> handler
-				.getColor(state, world, pos, txtindx), blk);
+		blockColors.register(handler::getColor, blk);
 		// If water shader, override global one too
 		if (blockName.equals("minecraft:water") && (handler instanceof CustomColorMultHandler)) {
 			final CustomColorMultHandler cchandler = (CustomColorMultHandler) handler;	// crappy java lambda limitation workaround

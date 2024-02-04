@@ -129,16 +129,16 @@ public class SolidBlockModelExport extends ModelExport {
 
     @Override
     public void doModelExports() throws IOException {
-			for (int idx = 0; idx < def.states.size(); idx++) {
-				WesterosBlockStateRecord rec = def.states.get(idx);
-				boolean isTinted = rec.isTinted();
-        boolean isOverlay = rec.getOverlayTextureByIndex(0) != null;
-				String id = (rec.stateID == null) ? "base" : rec.stateID;
-				// Loop over the random sets we've got
-				for (int setidx = 0; setidx < rec.getRandomTextureSetCount(); setidx++) {
-					doSolidModel(getModelName(id, setidx), isTinted, isOverlay, setidx, rec, idx);
-				}
-      }
+		for (int idx = 0; idx < def.states.size(); idx++) {
+			WesterosBlockStateRecord rec = def.states.get(idx);
+			boolean isTinted = rec.isTinted();
+			boolean isOverlay = rec.getOverlayTextureByIndex(0) != null;
+			String id = (rec.stateID == null) ? "base" : rec.stateID;
+			// Loop over the random sets we've got
+			for (int setidx = 0; setidx < rec.getRandomTextureSetCount(); setidx++) {
+				doSolidModel(getModelName(id, setidx), isTinted, isOverlay, setidx, rec, idx);
+			}
+       }
       // Build simple item model that refers to block model
       ModelObject mo = new ModelObject();
       WesterosBlockStateRecord sr0 = def.states.get(0);
